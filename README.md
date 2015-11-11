@@ -1,66 +1,35 @@
 # Search Jira Issues - Alfred 2 Workflow
 
+
+该 Workflow 改自[Search Jira Issues](https://github.com/swissmanu/search-jira-issues-alfred-workflow), 主要是在它的基础上支持了 HTTP 服务器的验证。它的主要作用是可以在 Alfred 2 里直接查看 JIRA 上的 issue，查询条件和身份验证信息可以通过配置文件指定，使用如图：
+
+![Workflow](screenshots/workflow.png)
 ![Workflow](screenshots/workflow.png)
 
-This workflow for Alfred 2 allows you to search issues on an Atlassian Jira installation. The queries used are customizable to your needs.
-
-## Dependencies
-
-* `jsawk`
-* `curl`
-
-The easiest way to install the dependencies is [`brew`](http://brew.sh/):
-
+##安装
+1. 使用 brew 安装依赖库
 ```bash
 $ brew install curl jsawk
 ```
 
-## Installation
-Download the [latest release](https://github.com/swissmanu/search-jira-issues-alfred-workflow/releases/latest) and open the `search.jira-issues.alfredworkflow` file to install it automatically to Alfred.
+2. 双击 jira.alfredworkflow 文件安装
 
-## Configuration
-You have to create your own `config.json` file before you can use the new workflow:
+3. 打开 Alfred -> Workflows -> JIRA, 右键 “Show in Finder”，找到 workflow 对应的文件夹, copy 一份 config.sample.json 文件为 config.json
 
-1. Open your Alfred settings, select the `Workflows` tab
-2. Right click the `Search JIRA Issues` workflow and select `Show in Finder`
-3. Copy the `config.sample.json` file and rename it to `config.json`. Open the copied file in the text editor of your choice.
-4. Modify the contained settings to your needs. Look below for further explanation of each setting.
-5. Save `config.json` and you are ready to go.
+4. 修改 config.json 里的
 
+| Item              |    Value |
+| :--------         | :--------|
+| authUser          | HTTP 验证用户名，比如我们的是 waterboy |
+| authPassword      | HTTP 验证密码 |
+| jiraUser          | JIRA 登陆账号 |
+| jiraPassword      | JIRA 登陆密码|
+| jiraUrl           | JIRA的地址，唱吧内部员工填 http://jira.changbagroup.com|
+| maxResults        | 最多一次显示多少结果，比如50|
+| emptySearchJql    | 默认的搜索语句, 比如我的是 `"project = 'IP' and affectedVersion = 'v7.0' and status  != Resolved && status != Closed && assignee=qiaoxueshi"`|
+| searchJql         | 条件查询语句，查询语句是 `"project = 'IP' and affectedVersion = 'v7.0' AND (text~'{query}') && assignee=qiaoxueshi"`， 让我们输入“jira 视频特效”时, 查询语句中的 `{query}` 会被替换为“视频特效”，查询出所有 7.0 版本 iOS 项目的任务中包含“视频特效“的 issues|
 
-### Available Settings
+5. 呼出 Alfred 2，键入 ”jira“ 或者 ”jira 关键字” 就会显示出搜索结果
 
-| Setting | Description | Example |
-| ------- | ----------- | ------- |
-| `user`  | The username you use to login to JIRA. | `spongebob` |
-| `password` | The password associated to the given username to login to JIRA. | `supersecret` |
-| `jiraUrl` | The URL of your JIRA installation. Make sure you DON'T enter a trailing `/`. | `https://myjira.com` |
-| `maxResults` | Limit the number of issues to display. | `20` |
-| `emptySearchJql` | This JQL query is executed if you don't enter any search term after the workflows keyword. See [Atlassians JQL documentation](https://confluence.atlassian.com/display/JIRA/Advanced+Searching) for available query options. | `project = 'FOO' ORDER BY lastViewed` |
-| `searchJql` | This JQL query is executed if you enter a search term after the workflows keyword. Use `{query}` to pass the entered search term to JIRA's API. See [Atlassians JQL documentation](https://confluence.atlassian.com/display/JIRA/Advanced+Searching) for available query options. | `project = 'FOO' summary~'{query}' ORDER BY lastViewed` |
-
-## Usage
-Open your Alfred prompt and start typing `jira`. The workflow will call JIRA's API with the given `emptySearchJql` JQL query if you enter no specific search term.
-As soon as you begin to type further, the `searchJql` JQL is used to fetch any matching issues.
-
-* Select an issue to open it in your default browser
-* Press `cmd` and select an issue copies the issues number to your clipboard
-* Press `alt` and select an issue copy-pastes the issues number to the current application.
-
-
-## Troubleshooting
-If Alfred is not able to retrieve any issues following fixes might help you:
-
-* Ensure that the `Script Filter` and all `Run Script` actions use your main shell as interpreter
-* Check your `config.json` for invalid JSON and/or wrong values
-
-
-# License
-Copyright (c) 2015 Manuel Alabor
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+> PS:
+具体的搜索语句可以在 JIRA 上通过 ”问题” -> "搜索问题"，选择要搜索的条件后，点击上方 “切换到高级搜索模式”，就会在右侧显示出 JQL，copy 到上方 emptySearchJql 处即可。
